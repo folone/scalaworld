@@ -3,6 +3,8 @@
 
 ![](https://cdn.eyeem.com/thumb/900/900/875ca603aa93985dfba529d82407d198ef9cad3d?highRes=true)
 
+https://github.com/folone/scalaworld
+
 ---
 
 ![](https://dl.dropboxusercontent.com/u/4274210/sc_cmyk_white.ai)
@@ -49,12 +51,12 @@
 
 ---
 
-# [fit] T-L-_what now?_[^2]
+# [fit] T-L-_what now?_[^0]
 # [fit] *ಠ_ಠ*
 
 ![](https://cdn.eyeem.com/thumb/900/900/cb2220a35cd33c137a8e096e6471550253d80fe0?highRes=true)
 
-[^2]: http://typelevel.org/blog/2014/09/02/typelevel-scala.html
+[^0]: http://typelevel.org/blog/2014/09/02/typelevel-scala.html
 
 ^ TLC -- short for typelevel compiler. Name actively endorsed by Daniel Spiewak.
 ^ A scala fork made by the typelevel organization, to scratch an itch.
@@ -64,7 +66,7 @@
 
 # [fit] Why we love ![Scala](http://www.scala-lang.org/resources/img/smooth-spiral@2x.png)
 
-:poop:
+:ghost:
 
 [Roll your own Scala](https://meta.plasm.us/posts/2015/07/11/roll-your-own-scala/)
 
@@ -94,19 +96,32 @@
 
 ![](https://cdn.eyeem.com/thumb/900/900/c0fb69ecda06f5d9a5ed5fed5093698b71b7b3fe?highRes=true)
 
-^ For the people who miss pre 2.8 days
+^ For the people who miss pre 2.10 days
 ^ An incubator for new ideas
 ^ Beneficial for typesafe scala: they get battle-tested contributions
 ^ good news: scala will soon be perfect because of The Third System Effect
-^ Note: we aren't compiler devs yet, we have full time jobs, and really don't know what we're doing. So don't take anything here as a promise or a final dicision or anything that has any level of commitement. The whole point of this talk is to inspire collaboration.
+^ Note: we aren't compiler devs yet, we have full time jobs, and really don't know what we're doing. So don't take anything here as a promise or a final decision or anything that has any level of commitment. The whole point of this talk is to inspire collaboration.
 ^ Also don't rely on our support for the same set of reasons
+^ Backwards compatibility with typesafe scala
 
 ---
 
 # [fit] scalaVersion        := "2.11.7"
 # [fit] scalaOrganization   := "org.typelevel"
 
+```sh
+∙ git clone git@github.com:folone/scalaworld.git && \
+  cd scalaworld && \
+  sbt -Dsbt.boot.properties=sbt.boot.properties
+
+[repositories]
+  maven-central
+```
+
 ^ sbt is awesome, works starting from 0.13.6
+^ jcenter has a version from mid August, which has a bug
+^ ONCE
+^ 2.11.8-SNAPSHOT is published as well
 
 ---
 
@@ -194,7 +209,8 @@ foo(23)(println) // Doesn't compile: "Returning Unit is forbidden."
 
 ---
 
-# Singleton types
+# Singleton types[^2]
+
 ```scala
 trait Assoc[K] { type V ; val v: V }
  
@@ -203,7 +219,9 @@ def mkAssoc[K, V0](k: K, v0: V0): Assoc[k.type] { type V = V0 } =
 def lookup[K](k: K)(implicit a: Assoc[k.type]): a.V = a.v
 ```
 
-^ Adrian's implementation
+[^2]: Requires `-Xexperimental` flag.
+
+^ Adriaan's implementation
 
 ---
 
@@ -311,7 +329,7 @@ val £': Byte  = 127z
 ^ point is being on the bleeding edge
 ^ as you can see, we're mostly adding small things and battle-testing them
 ^ no one one of us is a compiler engineer
-^ eventually we plan to get better at compile development, and work on bigger, more impactful features
+^ eventually we plan to get better at compiler development, and work on bigger, more impactful features
 ^ not to split the community
 ^ compiler plugin?
 
@@ -363,6 +381,14 @@ val £': Byte  = 127z
 
 ---
 
+# Rethinking the role of implicits[^3]
+
+![left](http://orig03.deviantart.net/870c/f/2013/141/2/6/mr__spock__zachary_quinto__by_lei_feiyang-d65xp7b.jpg)
+
+[^3]: https://github.com/typelevel/scala/issues/28 -- `@implicitWeight`
+
+---
+
 # [fit] Hands-on
 
 ```scala
@@ -379,35 +405,51 @@ scalaOrganization := "org.typelevel"
 # [fit] Hands-on
 
 ```sh
-∙ cat ~/.sbt/boot/sbt.boot.properties
-[scala]
-  version: ${sbt.scala.version-auto}
+∙ sbt -Dsbt.boot.properties=sbt.boot.properties
+```
 
-[app]
-  org: ${sbt.organization-org.scala-sbt}
-  name: sbt
-  version: ${sbt.version-read(sbt.version)[0.13.9]}
-  class: sbt.xMain
-  components: xsbti,extra
-  cross-versioned: ${sbt.cross.versioned-false}
-  resources: ${sbt.extraClasspath-}
-
+```
 [repositories]
   maven-central
-∙
 ```
 
 ^ jcenter has a version from mid August, which has a bug
+^ ONCE
 
 ---
 
 # [fit] What do I do once I check out the repo?
 
+![](https://cdn.eyeem.com/thumb/900/900/b3e399eb305e00d673d8db4d2a7e4a9506dbb140?highRes=true)
+
+---
+# `sbt build` vs `ant build`
+
+^ Compile from scratch ~5mins
 ^ use the sbt build, it can do most of the things
 ^ if you're hardcore, before commiting do `ant test` (will fail right now though)
 ^ you can `sbt publish-local`
-^ `ant build`
-^ if all the things have failed, `ant all.clean`
+
+![](https://cdn.eyeem.com/thumb/900/900/b3e399eb305e00d673d8db4d2a7e4a9506dbb140?highRes=true)
+
+---
+# `sbt test` vs `ant test`
+# `./tools/partest-ack`
+
+^ `ant test` ~1-2 hours
+^ `sbt test` ~3 minutes
+
+![](https://cdn.eyeem.com/thumb/900/900/b3e399eb305e00d673d8db4d2a7e4a9506dbb140?highRes=true)
+
+---
+
+# `sbt publish` vs `ant publish-local-opt`
+
+![](https://cdn.eyeem.com/thumb/900/900/b3e399eb305e00d673d8db4d2a7e4a9506dbb140?highRes=true)
+
+---
+
+# If all the things have failed, `ant all.clean`
 
 ![](https://cdn.eyeem.com/thumb/900/900/b3e399eb305e00d673d8db4d2a7e4a9506dbb140?highRes=true)
 
@@ -419,6 +461,7 @@ scalaOrganization := "org.typelevel"
 ^ No community splitting
 ^ Bleeding edge
 ^ Try now, contribute
+^ We'll be reviving the project, marking low-hanging fruit tasks, etc.
 
 ![](https://cdn.eyeem.com/thumb/900/900/df7222e32cfeba37071041878bf50cb62e709b06?highRes=true)
 
